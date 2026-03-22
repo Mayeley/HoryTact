@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1a1a2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>Mon QR Contact</title>
@@ -17,7 +17,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: white;
             overflow-x: hidden;
@@ -37,8 +37,8 @@
 
         .avatar-container {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             margin: 0 auto 20px;
         }
 
@@ -46,14 +46,14 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 4px solid rgba(255,255,255,0.3);
-            object-fit: cover;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 4px solid rgba(255,255,255,0.9);
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 4px rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 2;
+            background-color: #f5f5f5;
         }
 
         .pulse {
@@ -61,15 +61,16 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.5);
+            border: 3px solid rgba(255,255,255,0.6);
             animation: pulse 2s infinite;
             top: 0;
             left: 0;
+            z-index: 1;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
 
         @keyframes fadeInDown {
@@ -78,35 +79,39 @@
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
         }
 
         .subtitle {
-            opacity: 0.9;
+            opacity: 0.85;
             font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
         .cards-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-top: 20px;
         }
 
         .card {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.15);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             gap: 15px;
             animation: fadeInUp 0.6s ease backwards;
+            position: relative;
+            overflow: hidden;
         }
 
         .card:nth-child(1) { animation-delay: 0.1s; }
@@ -122,34 +127,52 @@
         }
 
         .card:hover {
-            transform: translateY(-5px) scale(1.02);
-            background: rgba(255,255,255,0.25);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.3);
         }
 
         .card:active {
             transform: scale(0.98);
         }
 
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
         .icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 15px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
+            flex-shrink: 0;
         }
 
         .card-info h3 {
             font-size: 16px;
             margin-bottom: 3px;
+            font-weight: 600;
         }
 
         .card-info p {
             font-size: 12px;
-            opacity: 0.8;
+            opacity: 0.75;
         }
 
         /* Modal QR */
@@ -160,7 +183,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -180,14 +203,15 @@
 
         .modal-content {
             background: white;
-            border-radius: 30px;
-            padding: 30px;
+            border-radius: 25px;
+            padding: 35px 25px;
             text-align: center;
-            max-width: 350px;
+            max-width: 340px;
             width: 100%;
-            color: #333;
+            color: #1a1a2e;
             position: relative;
             animation: slideUp 0.4s ease;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
         @keyframes slideUp {
@@ -196,65 +220,76 @@
         }
 
         .modal-avatar {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            margin: -60px auto 15px;
+            margin: -65px auto 15px;
             border: 4px solid white;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background-color: #f5f5f5;
         }
 
         #qrcode {
             margin: 20px auto;
-            padding: 20px;
+            padding: 15px;
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             display: inline-block;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #qrcode img {
+            border-radius: 8px;
         }
 
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
             border: none;
             background: #f0f0f0;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
+            color: #666;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .close-btn:hover {
             background: #e0e0e0;
             transform: rotate(90deg);
+            color: #333;
         }
 
         .share-instructions {
             margin-top: 15px;
-            padding: 15px;
+            padding: 12px;
             background: #f8f9fa;
-            border-radius: 12px;
-            font-size: 13px;
-            color: #666;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.4;
         }
 
         .platform-badge {
             display: inline-block;
-            padding: 5px 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
             color: white;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         /* Installation prompt */
@@ -264,16 +299,17 @@
             left: 50%;
             transform: translateX(-50%);
             background: white;
-            color: #333;
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #1a1a2e;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             display: none;
             align-items: center;
-            gap: 10px;
-            font-size: 14px;
+            gap: 12px;
+            font-size: 13px;
             z-index: 100;
             animation: slideUp 0.5s ease;
+            font-weight: 500;
         }
 
         .install-prompt.show {
@@ -281,18 +317,29 @@
         }
 
         .install-btn {
-            background: #667eea;
+            background: #1a1a2e;
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
         }
 
         @media (max-width: 480px) {
             .container {
                 padding: 15px;
+            }
+            
+            .avatar-container {
+                width: 130px;
+                height: 130px;
             }
         }
     </style>
@@ -302,14 +349,14 @@
         <header>
             <div class="avatar-container">
                 <div class="pulse"></div>
-                <div class="avatar" id="userAvatar">👤</div>
+                <div class="avatar" id="userAvatar" style="background-image: url('https://i.imgur.com/oEBZUwG.jpeg');"></div>
             </div>
             <h1>Mes QR Contacts</h1>
             <p class="subtitle">Tap pour partager</p>
         </header>
 
         <div class="cards-container">
-            <div class="card" onclick="showQR('phone', 'Téléphone & WhatsApp', 'tel:+32483817491', '📱')">
+            <div class="card" onclick="showQR('phone')">
                 <div class="icon">📱</div>
                 <div class="card-info">
                     <h3>Principal</h3>
@@ -317,7 +364,7 @@
                 </div>
             </div>
 
-            <div class="card" onclick="showQR('whatsapp2', 'WhatsApp Business', 'https://wa.me/32466481012', '💬')">
+            <div class="card" onclick="showQR('whatsapp2')">
                 <div class="icon" style="background: #25d36620;">💬</div>
                 <div class="card-info">
                     <h3>WhatsApp 2e</h3>
@@ -325,7 +372,7 @@
                 </div>
             </div>
 
-            <div class="card" onclick="showQR('snapchat', 'Snapchat', 'https://snapchat.com/add/hory_sonh', '👻')">
+            <div class="card" onclick="showQR('snapchat')">
                 <div class="icon" style="background: #fffc0020;">👻</div>
                 <div class="card-info">
                     <h3>Snapchat</h3>
@@ -333,7 +380,7 @@
                 </div>
             </div>
 
-            <div class="card" onclick="showQR('youtube', 'YouTube', 'https://youtube.com/@hdtraining', '▶️')">
+            <div class="card" onclick="showQR('youtube')">
                 <div class="icon" style="background: #ff000020;">▶️</div>
                 <div class="card-info">
                     <h3>YouTube</h3>
@@ -341,7 +388,7 @@
                 </div>
             </div>
 
-            <div class="card" onclick="showQR('instagram', 'Instagram', 'https://instagram.com/hory_sonh_deva', '📸')">
+            <div class="card" onclick="showQR('instagram')">
                 <div class="icon" style="background: #e4405f20;">📸</div>
                 <div class="card-info">
                     <h3>Instagram</h3>
@@ -349,7 +396,7 @@
                 </div>
             </div>
 
-            <div class="card" onclick="showQR('signal', 'Signal', 'https://signal.me/#p/+32483817491', '🔒')">
+            <div class="card" onclick="showQR('signal')">
                 <div class="icon" style="background: #3a76f020;">🔒</div>
                 <div class="card-info">
                     <h3>Signal</h3>
@@ -363,8 +410,7 @@
     <div class="modal" id="qrModal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <div class="modal-avatar" id="modalAvatar" style="background: 
-			url('https://imgur.com/a/yxKLLJI) center/cover no-repeat; font-size: 0;"></div>
+            <div class="modal-avatar" style="background-image: url('https://i.imgur.com/oEBZUwG.jpeg');"></div>
             <span class="platform-badge" id="platformBadge">Platform</span>
             <h2 id="platformTitle" style="margin-bottom: 5px; color: #333;">Title</h2>
             <p id="platformSubtitle" style="color: #666; font-size: 14px; margin-bottom: 20px;">Scanne moi !</p>
@@ -385,50 +431,50 @@
     </div>
 
     <script>
-        // Configuration - MODIFIE CES LIENS AVEC TES VRAIES INFOS
+        // Configuration de tes contacts
         const contacts = {
             phone: {
                 title: 'Téléphone & WhatsApp',
-                url: 'tel:+32483817491', // Remplace par ton numéro
+                url: 'tel:+32483817491',
                 icon: '📱',
-                color: '#667eea'
+                subtitle: '+32 483 81 74 91'
             },
             whatsapp2: {
                 title: 'WhatsApp 2ème',
-                url: 'https://wa.me/32466481012', // Remplace par ton 2e numéro
+                url: 'https://wa.me/32466481012',
                 icon: '💬',
-                color: '#25d366'
+                subtitle: '+32 466 48 10 12'
             },
             snapchat: {
                 title: 'Snapchat',
-                url: 'https://snapchat.com/add/hory_sonh', // Remplace par ton pseudo
+                url: 'https://snapchat.com/add/hory_sonh',
                 icon: '👻',
-                color: '#fffc00'
+                subtitle: '@hory_sonh'
             },
             youtube: {
                 title: 'YouTube',
-                url: 'https://youtube.com/@hdtraining', // Remplace par ta chaîne
+                url: 'https://youtube.com/@hdtraining',
                 icon: '▶️',
-                color: '#ff0000'
+                subtitle: '@hdtraining'
             },
             instagram: {
                 title: 'Instagram',
-                url: 'https://instagram.com/hory_sonh_deva', // Remplace par ton pseudo
+                url: 'https://instagram.com/hory_sonh_deva',
                 icon: '📸',
-                color: '#e4405f'
+                subtitle: '@hory_sonh_deva'
             },
             signal: {
                 title: 'Signal',
-                url: 'https://signal.me/#p/+32483817491', // Remplace par ton numéro Signal
+                url: 'https://signal.me/#p/+32483817491',
                 icon: '🔒',
-                color: '#3a76f0'
+                subtitle: 'Signal Secure'
             }
         };
 
         let deferredPrompt;
 
         // Gestion du QR Code
-        function showQR(type, title, url, icon) {
+        function showQR(type) {
             const modal = document.getElementById('qrModal');
             const qrContainer = document.getElementById('qrcode');
             const contact = contacts[type];
@@ -436,7 +482,7 @@
             // Mise à jour du contenu
             document.getElementById('platformTitle').textContent = contact.title;
             document.getElementById('platformBadge').textContent = contact.title;
-            document.getElementById('modalAvatar').textContent = document.getElementById('userAvatar').textContent;
+            document.getElementById('platformSubtitle').textContent = contact.subtitle;
             
             // Génération du QR
             qrContainer.innerHTML = '';
@@ -479,11 +525,6 @@
                 }
                 deferredPrompt = null;
             }
-        }
-
-        // Personnalisation de l'avatar (optionnel)
-        function setAvatar(emoji) {
-            document.getElementById('userAvatar').textContent = emoji;
         }
 
         // Service Worker pour offline
