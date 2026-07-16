@@ -51,8 +51,8 @@
         .modal-content { background: white; border-radius: 25px; padding: 35px 25px; text-align: center; max-width: 340px; width: 100%; color: #1a1a2e; position: relative; animation: slideUp 0.4s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-avatar { width: 90px; height: 90px; border-radius: 50%; margin: -65px auto 15px; border: 4px solid white; background-size: cover; background-position: center top; background-repeat: no-repeat; box-shadow: 0 8px 25px rgba(0,0,0,0.3); background-color: #f5f5f5; }
-        #qrcode { margin: 20px auto; padding: 15px; background: white; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #qrcode img { border-radius: 8px; }
+        #qrcode { margin: 20px auto; padding: 15px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; width: 230px; height: 230px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #qrcode img { border-radius: 8px; max-width: 200px; max-height: 200px; }
         .close-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; background: #f0f0f0; border-radius: 50%; cursor: pointer; font-size: 18px; color: #666; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .close-btn:hover { background: #e0e0e0; transform: rotate(90deg); color: #333; }
         .share-instructions { margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 10px; font-size: 12px; color: #555; line-height: 1.4; }
@@ -223,6 +223,7 @@
         const GITHUB_OWNER = "Mayeley";
         const GITHUB_REPO = "HoryTact";
         const GITHUB_FILE = "contacts.json";
+        const GITHUB_AVATAR_FILE = "avatar.json";
 
         const iconLibrary = {
             "📱": '<svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>',
@@ -275,7 +276,7 @@
             "🎸": '<svg viewBox="0 0 24 24"><path d="M19.59 3H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>'
         };
 
-         const defaultContacts = [
+        const defaultContacts = [
             { id: 1, title: "Telephone", subtitle: "+32 483 81 74 91", url: "tel:+32483817491", icon: "📱" },
             { id: 2, title: "WhatsApp", subtitle: "Envoyer un message", url: "https://wa.me/32466481012", icon: "💬" },
             { id: 3, title: "Snapchat", subtitle: "@hory_sonh", url: "https://snapchat.com/add/hory_sonh", icon: "👻" },
@@ -301,6 +302,11 @@
             document.getElementById("autoSyncToggle").checked = autoSync;
             document.addEventListener("click", closeAllMenus);
             setTimeout(() => document.getElementById("installPrompt").classList.add("show"), 3000);
+
+            // Auto-pull depuis GitHub si connecte
+            if (githubToken) {
+                pullFromGitHub();
+            }
         }
 
         function renderCards() {
@@ -351,8 +357,9 @@
             document.getElementById("platformTitle").textContent = contact.subtitle;
             document.getElementById("platformSubtitle").textContent = "Scanne moi !";
             document.getElementById("modalAvatar").style.backgroundImage = document.getElementById("userAvatar").style.backgroundImage;
-            document.getElementById("qrcode").innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
                 text: contact.url,
                 width: 200,
                 height: 200,
@@ -441,6 +448,29 @@
             if (autoSync && githubToken) pushToGitHub();
         }
 
+        async function saveAvatarAndSync() {
+            if (autoSync && githubToken) {
+                showSyncStatus("syncing", "Sync avatar...");
+                const avatar = localStorage.getItem("horytact_avatar");
+                if (avatar) {
+                    try {
+                        const avatarSha = await getFileSha(GITHUB_AVATAR_FILE);
+                        const avatarData = { avatar: avatar };
+                        const avatarContent = btoa(unescape(encodeURIComponent(JSON.stringify(avatarData, null, 2))));
+                        await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_AVATAR_FILE}`, {
+                            method: "PUT",
+                            headers: { "Authorization": "token " + githubToken, "Content-Type": "application/json" },
+                            body: JSON.stringify({ message: "Update avatar", content: avatarContent, sha: avatarSha })
+                        });
+                        showSyncStatus("synced", "Avatar sync");
+                    } catch (e) {
+                        console.error("Avatar sync error:", e);
+                        showSyncStatus("error", "Avatar sync");
+                    }
+                }
+            }
+        }
+
         function resetToDefault() {
             if (!confirm("Reinitialiser tous les contacts ?")) return;
             contacts = [...defaultContacts];
@@ -475,7 +505,7 @@
                     const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
                     localStorage.setItem("horytact_avatar", dataUrl);
                     document.getElementById("userAvatar").style.backgroundImage = `url(${dataUrl})`;
-                    if (autoSync && githubToken) pushToGitHub();
+                    if (autoSync && githubToken) saveAvatarAndSync();
                 };
                 img.src = e.target.result;
             };
@@ -486,7 +516,7 @@
             const avatar = localStorage.getItem("horytact_avatar");
             if (avatar) document.getElementById("userAvatar").style.backgroundImage = `url(${avatar})`;
         }
-		
+
 		// ===== GITHUB SYNC =====
         function openGitHubModal() { document.getElementById("githubModal").classList.add("active"); }
         function closeGitHubModal() { document.getElementById("githubModal").classList.remove("active"); }
