@@ -1140,6 +1140,13 @@
         function showQR(id) {
             const contact = contacts.find(c => c.id === id);
             if (!contact) return;
+			const qrModal = document.getElementById("qrModal");
+			const qrModalContent = qrModal.querySelector(".modal-content");
+
+			/* Toujours rouvrir la fenêtre au début, même après avoir fait défiler
+			   un QR précédent sur un petit écran. */
+			qrModal.scrollTop = 0;
+			qrModalContent.scrollTop = 0;
             document.getElementById("platformBadge").textContent = contact.title;
             document.getElementById("platformTitle").textContent = contact.subtitle;
             document.getElementById("platformSubtitle").textContent = "Scanne moi !";
@@ -1154,10 +1161,19 @@
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
             });
-            document.getElementById("qrModal").classList.add("active");
+			qrModal.classList.add("active");
+			requestAnimationFrame(() => {
+				qrModal.scrollTop = 0;
+				qrModalContent.scrollTop = 0;
+			});
         }
 
-        function closeModal() { document.getElementById("qrModal").classList.remove("active"); }
+		function closeModal() {
+			const qrModal = document.getElementById("qrModal");
+			qrModal.classList.remove("active");
+			qrModal.scrollTop = 0;
+			qrModal.querySelector(".modal-content").scrollTop = 0;
+		}
 
         function editContact(id) {
             currentEditId = id;
